@@ -110,7 +110,7 @@
 ### DOM 事件模型
 捕获从上到下， 冒泡从下到上。
 先捕获，再到目标，再冒泡
-![事件模型](../imges/dom事件模型.jpg)
+![事件模型](https://github.com/huiling914/web/blob/master/images/dom事件模型.jpg)
 
 
 
