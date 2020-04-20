@@ -16,26 +16,101 @@
 
 
 ### DOM事件级别
- - DOM0
+ - DOM0（**直接在dom对象上注册事件，所有浏览器都支持**）
    - onXXX类型的定义事件
    - element.onclick = function(e) { ... }
- - DOM2
+   ```
+   //事件绑定
+    document.getElementById("patty").onclick = function(e){};／
+    document.getElementById("patty")["onmousemover"] = function(e){};
+
+    //事件解绑
+    document.getElementById("patty")["onmousemover"] = null;
+
+    //阻止默认事件（默认事件行为：href=""链接，submit表单提交等）
+    document.getElementById("patty").onclick = function() {
+        ……                         //你的代码
+        return false;              //通过返回false值阻止默认事件行为
+    };
+   
+   ```
+   - 事件绑定通过.和[]的两种方式访问js对象属性的方法，[]的形式主要是为了解决属性名不是合法的标识符，比如：object.123肯定报错，但是object["123"]就避免了这个问题，与此同时，[]的写法，更加灵活，用字符串表示属性名称，可以在运行时动态绑定事件。
+   - return false 的含义不是阻止事件继续向顶层元素传播，而是阻止浏览器对事件的默认处理。 return false 只在当前函数有效，不会影响其他外部函数的执行。
+   
+ - DOM2(支持同一dom元素注册多个同种事件)
    - addEventListener方式
    - element.addEventListener('click', function (e) { ... })
    - btn.removeEventListener('click', func, false)
    - btn.attachEvent("onclick", func);
    - btn.detachEvent("onclick", func);
- - DOM3
-   - 增加了很多事件类型
-   - element.addEventListener('keyup', function (e) { ... })
-   - eventUtil 是自定义对象，textInput 是 DOM3 级事件
+   
+   **(1)addEventListener(event.type, handle, boolean); IE8及以下不支持**
+    事件类型没有**on**，第三个参数false 表示在事件第三阶段（冒泡）触发，true表示在事件第一阶段（捕获）触发。 如果handle是同一个方法，只执行一次。
+   ```
+   var element=document.getElementById("patty");
+   var handler=function(){ }
+   //绑定事件
+   element.addEventListener('click', handler, false);  
+   //解绑事件
+   element.removeEventListener('click', handle, false);
+   //阻止默认事件
+   element.addEventListener("click", function(e){
+       var event = e || window.event;
+       ……
+       event.preventDefault( );      //阻止默认事件
+   },false);
+   ```
+   **(2)attachEvent(event.type, handle ); IE特有，兼容IE8及以下，可添加多个事件处理程序，只支持冒泡阶段，并不属于DOM2**
+   如果handle是同一个方法，绑定几次执行几次，这点和addEventListener不同。事件类型要加on,例如onclick而不是click
+   ```
+   var element=document.getElementById("patty");
+   var handler=function(){ }
+   /绑定事件
+   element.attachEvent('onclick', handler); 
+   //解绑事件，参数和绑定一样
+   element.detachEvent("onclick", handler);
+   //阻止默认事件
+   element.attachEvent("onclick", function(e){
+       var event = e || window.event;
+       ……
+       event.returnValue = false;       //阻止默认事件
+   },false);
+   ```
+    - DOM3
+     - 增加了很多事件类型
+     - element.addEventListener('keyup', function (e) { ... })
+     - eventUtil 是自定义对象，textInput 是 DOM3 级事件
 
+### 封装事件绑定与解绑函数,兼容浏览器
+```
+   // 事件绑定
+   function addEvent(element, eType, handler, bol) {
+       if(element.addEventListener){           //如果支持addEventListener
+           element.addEventListener(eType, handler bol);
+       }else if(element.attachEvent){          //如果支持attachEvent
+           element.attachEvent("on"+eType, handler);
+       }else{                                  //否则使用兼容的onclick绑定
+           element["on"+eType] = handle;
+       }
+   }
+
+   //事件解绑
+   function removeEvent(element, eType, handler, bol) {
+       if(element.addEventListener){
+           element.removeEventListener(eType, handler, bol);
+       }else if(element.attachEvent){
+           element.detachEvent("on"+eType, handler);
+       }else{
+           element["on"+eType] = null;
+       }
+   }
+   ```
 
 
 ### DOM 事件模型
 捕获从上到下， 冒泡从下到上。
 先捕获，再到目标，再冒泡
-![事件模型](../img/dom事件模型.jpg)
+![事件模型](../imges/dom事件模型.jpg)
 
 
 
