@@ -13,7 +13,7 @@
 
 [DOM操作](https://blog.csdn.net/Night_Emperor/article/details/78471051)
 
-
+[JavaScript事件——事件冒泡，事件捕获，事件绑定与解绑，事件委托](https://www.jianshu.com/p/5b104a34a630)
 
 ### DOM事件级别
  - DOM0（**直接在dom对象上注册事件，所有浏览器都支持**）
